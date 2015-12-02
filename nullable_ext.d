@@ -24,8 +24,13 @@ unittest
 {
     struct Hoge { int A; }
 
-    auto b = nullable(Hoge(0)).map!(a => a.A);
+    auto a = nullable(Hoge(0)).map!(a => a.A);
+    assert(!a.isNull);
+    assert(a == 0);
+
+    auto b = nullable(0).map!("a");
     assert(!b.isNull);
+    assert(b == 0);
 
     auto c = Nullable!int().map!("a");
     assert(c.isNull);
