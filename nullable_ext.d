@@ -1,28 +1,33 @@
 import std.stdio;
 import std.typecons;
+import std.functional;
 
 Nullable!T nullable(T)(T val)
 {
     return Nullable!T(val);
 }
 
-Nullable!R map(TT : Nullable!T, RR : R function(T), T, R)(TT nullable, RR fn)
+template map(alias fun)
 {
-    typeof(return) result;
-    if(!nullable.isNull) {
-        result = fn(nullable.get);
+    auto map(TT: Nullable!T, T)(TT t)
+    {
+        alias _fun = unaryFun!fun;
+        Nullable!(typeof(_fun(t.get))) result;
+        if(!t.isNull) {
+            result = nullable(_fun(t.get));
+        }
+        return result;
     }
-    return result;
 }
 
 unittest
 {
     struct Hoge { int A; }
 
-    auto b = nullable(Hoge(0)).map( (Hoge a) => a.A );
+    auto b = nullable(Hoge(0)).map!(a => a.A);
     assert(!b.isNull);
 
-    auto c = Nullable!int().map( (int a) => a );
+    auto c = Nullable!int().map!("a");
     assert(c.isNull);
 }
 
