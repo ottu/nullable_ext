@@ -36,42 +36,61 @@ unittest
     assert(c.isNull);
 }
 
-R getOrElse(TT: Nullable!T, R, T)(TT nullable, R val)
+auto getOrElse(TT: Nullable!T, R, T)(TT nullable, R val)
 {
-    typeof(return) result = val;
     if(!nullable.isNull) {
-        result = nullable.get;
+        return nullable.get;
+    } else {
+        return val;
     }
-    return result;
 }
 
 unittest
 {
-    auto d = nullable(0).getOrElse(10);
-    assert( d == 0 );
-    assert( typeof(d).stringof == "int" );
+    auto a = nullable(0).getOrElse(10);
+    assert( a == 0 );
+    assert( typeof(a).stringof == "int" );
 
-    auto e = Nullable!string().getOrElse("null");
-    assert( e == "null" );
-    assert( typeof(e).stringof == "string" );
+    auto b = Nullable!string().getOrElse("hoge");
+    assert( b == "hoge" );
+    assert( typeof(b).stringof == "string" );
+
+    class A {}
+    class B : A {}
+
+    auto c = getOrElse(Nullable!A(new A), new B);
+    assert( typeof(c).stringof == "A" );
+
+    auto d = getOrElse(Nullable!A(new B), new A);
+    assert( typeof(d).stringof == "A" );
+
+    auto e = getOrElse(Nullable!A(), new B);
+    assert( typeof(e).stringof == "A" );
+
+    auto f = getOrElse(Nullable!B(), new A);
+    assert( typeof(f).stringof == "A" );
 }
 
-TT orElse(TT: Nullable!T, T)(TT nullable, TT val)
+auto orElse(TT: Nullable!T, T)(TT nullable, TT val)
 {
-    typeof(return) result = val;
     if(!nullable.isNull) {
-        result = nullable;
+        return nullable;
+    } else {
+        return val;
     }
-    return result;
 }
 
 unittest
 {
-    auto f = nullable(0).orElse(Nullable!int(10));
-    assert( f == 0 );
-    assert( typeof(f).stringof == "Nullable!int");
+    auto a = nullable(0).orElse(nullable(10));
+    assert( a == 0 );
+    assert( typeof(a).stringof == "Nullable!int");
 
-    auto g = Nullable!int().orElse(Nullable!int(10));
-    assert( g == 10 );
-    assert( typeof(g).stringof == "Nullable!int");
+    auto b = Nullable!int().orElse(nullable(10));
+    assert( b == 10 );
+    assert( typeof(b).stringof == "Nullable!int");
+
+    auto c = Nullable!int().orElse(Nullable!int());
+    assert( c.isNull );
+    assert( typeof(c).stringof == "Nullable!int");
 }
