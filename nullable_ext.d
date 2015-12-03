@@ -55,13 +55,25 @@ unittest
     assert( b == "hoge" );
     assert( typeof(b).stringof == "string" );
 
+    auto z = nullable(5000000000L).getOrElse(0L);
+    assert( typeof(z).stringof == "long" );
+
+    auto y = nullable(0L).getOrElse(9000000000L);
+    assert( typeof(y).stringof == "long" );
+
+    auto x = nullable(-1).getOrElse(3000000000U);
+    assert( typeof(x).stringof == "int" ); // !?
+
+    auto w = Nullable!uint().getOrElse(3000000000U);
+    assert( typeof(w).stringof == "uint" );
+
     class A {}
     class B : A {}
 
     auto c = getOrElse(Nullable!A(new A), new B);
     assert( typeof(c).stringof == "A" );
 
-    auto d = getOrElse(Nullable!A(new B), new A);
+    auto d = getOrElse(Nullable!B(new B), new A);
     assert( typeof(d).stringof == "A" );
 
     auto e = getOrElse(Nullable!A(), new B);
